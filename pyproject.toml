@@ -1,12 +1,10 @@
-[project]
+[tool.poetry]
 name = "movie-rating-system"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Reza Hashemi",email = "rezahashemipersonalemail@gmail.com"}
-]
+authors = ["Reza Hashemi <rezahashemipersonalemail@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.12"
+
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.104.1"
@@ -21,3 +19,4 @@ python-dotenv = "^1.0.0"
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
