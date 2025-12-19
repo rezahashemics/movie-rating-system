@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.repositories.movie_repository import MovieRepository
-from app.schemas.movie_schemas import PaginatedMovies, Movie
+from app.schemas.movie_schemas import PaginatedMovies, Movie, MovieCreate, MovieUpdate
 
 class MovieService:
     def __init__(self):
@@ -16,3 +16,10 @@ class MovieService:
 
     def delete_movie(self, db: Session, movie_id: int):
         self.repo.delete_movie(db, movie_id)
+    def create_movie(self, db: Session, movie_data: MovieCreate):
+        movie = self.repo.create_movie(db, movie_data)
+        return Movie.from_orm(movie)
+
+    def update_movie(self, db: Session, movie_id: int, movie_data: MovieUpdate):
+        movie = self.repo.update_movie(db, movie_id, movie_data)
+        return Movie.from_orm(movie)
