@@ -1,3 +1,4 @@
+from sqlalchemy.orm import Session
 from sqlalchemy import select
 from app.models.movie_ratings import MovieRating
 from app.exceptions.custom_exceptions import NotFoundException, ValidationException
