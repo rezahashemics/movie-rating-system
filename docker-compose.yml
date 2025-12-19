@@ -6,7 +6,7 @@ services:
     restart: always  # Auto-restart if it crashes
     environment:
       POSTGRES_USER: postgres  # Matches your .env
-      POSTGRES_PASSWORD: password  # Matches your .env
+      POSTGRES_PASSWORD: postgres  # Matches your .env
       POSTGRES_DB: movie_db  # Auto-creates this DB on first run
     ports:
       - "5432:5432"  # Exposes Postgres on localhost:5432
