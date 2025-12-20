@@ -1,3 +1,4 @@
+# app/models/movies.py (complete code with fix for cascade delete on ratings)
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from app.db.database import Base
@@ -12,4 +13,4 @@ class Movie(Base):
 
     director = relationship("Director")
     genres = relationship("Genre", secondary="movie_genres", back_populates="movies")
-    ratings = relationship("MovieRating", back_populates="movie")
+    ratings = relationship("MovieRating", back_populates="movie", cascade="all, delete")  # Fix: Add cascade delete for ratings

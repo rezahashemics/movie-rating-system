@@ -1,6 +1,8 @@
+# app/repositories/rating_repository.py (complete code with fix for NameError)
+from sqlalchemy import select, func, delete
 from sqlalchemy.orm import Session
-from sqlalchemy import select
 from app.models.movie_ratings import MovieRating
+from app.models.movies import Movie  # Fix: Import Movie model
 from app.exceptions.custom_exceptions import NotFoundException, ValidationException
 
 class RatingRepository:
@@ -18,3 +20,11 @@ class RatingRepository:
         db.commit()
         db.refresh(rating)
         return rating
+
+    def get_average_rating(self, db: Session, movie_id: int):
+        avg_query = select(func.avg(MovieRating.score)).filter(MovieRating.movie_id == movie_id)
+        count_query = select(func.count(MovieRating.id)).filter(MovieRating.movie_id == movie_id)
+        return db.scalar(avg_query), db.scalar(count_query)
+
+    def delete_ratings_for_movie(self, db: Session, movie_id: int):
+        db.execute(delete(MovieRating).where(MovieRating.movie_id == movie_id))
