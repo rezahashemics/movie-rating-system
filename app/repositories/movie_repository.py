@@ -1,11 +1,14 @@
-# app/repositories/movie_repository.py (complete code with fix for NameError)
-from sqlalchemy import select, delete
+# app/repositories/movie_repository.py (complete code with all fixes)
+from sqlalchemy import select, delete, func
 from sqlalchemy.orm import Session, joinedload, selectinload
 from app.models.movies import Movie
-from app.models.movie_genres import movie_genres  # Fix: Import movie_genres Table
-from app.exceptions.custom_exceptions import NotFoundException, ValidationException
+from app.models.genres import Genre
+from app.models.directors import Director
+from app.models.movie_ratings import MovieRating
+from app.models.movie_genres import movie_genres
 from app.repositories.director_repository import DirectorRepository
 from app.repositories.genre_repository import GenreRepository
+from app.exceptions.custom_exceptions import NotFoundException, ValidationException
 
 class MovieRepository:
     def get_movies(self, db: Session, page: int, page_size: int, title: str = None, release_year: int = None, genre: str = None):
@@ -46,7 +49,7 @@ class MovieRepository:
         dir_repo.get_director_by_id(db, movie_data.director_id)  # Validates
 
         genre_repo = GenreRepository()
-        valid_genres = genre_repo.get_genres_by_ids(db, movie_data.genres)  # Validates
+        genre_repo.get_genres_by_ids(db, movie_data.genres)  # Validates
 
         movie = Movie(
             title=movie_data.title,
@@ -68,19 +71,19 @@ class MovieRepository:
     def update_movie(self, db: Session, movie_id: int, movie_data):
         movie = self.get_movie_by_id(db, movie_id)  # Raises if not found
 
-        if movie_data.title:
+        if movie_data.title is not None:
             movie.title = movie_data.title
-        if movie_data.release_year:
+        if movie_data.release_year is not None:
             movie.release_year = movie_data.release_year
-        if movie_data.cast:
+        if movie_data.cast is not None:
             movie.cast = movie_data.cast
 
         if movie_data.genres is not None:
             # Clear existing genres
             db.execute(delete(movie_genres).where(movie_genres.c.movie_id == movie_id))
-            # Add new (after validation)
             genre_repo = GenreRepository()
-            genre_repo.get_genres_by_ids(db, movie_data.genres)
+            genre_repo.get_genres_by_ids(db, movie_data.genres)  # Validates
+            # Add new
             for genre_id in movie_data.genres:
                 db.execute(movie_genres.insert().values(movie_id=movie_id, genre_id=genre_id))
 
