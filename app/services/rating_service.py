@@ -2,12 +2,14 @@ from sqlalchemy.orm import Session
 from app.repositories.rating_repository import RatingRepository
 from app.schemas.rating_schemas import RatingCreate, Rating
 from app.logging.logger import logger
+from app.logging.decorators import log_function_call
 
 class RatingService:
     def __init__(self):
         self.repo = RatingRepository()
 
-    def create_rating(self, db: Session, movie_id: int, rating_data: RatingCreate):
+    @log_function_call
+    def create_rating(self, db: Session, movie_id: int, rating_data: RatingCreate):    
         try:
             if not 1 <= rating_data.score <= 10:
                 logger.error("Invalid rating value", extra={
