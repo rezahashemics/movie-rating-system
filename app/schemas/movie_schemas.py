@@ -1,4 +1,4 @@
-# app/schemas/movie_schemas.py (complete code with fix for 422 validation on PUT)
+# app/schemas/movie_schemas.py (complete code with fix for cast required error - make all fields optional for update)
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
@@ -9,9 +9,6 @@ class DirectorBase(BaseModel):
 
 class Director(DirectorBase):
     id: int
-
-    class Config:
-        from_attributes = True
 
 class GenreBase(BaseModel):
     name: str
@@ -24,21 +21,21 @@ class MovieCreate(BaseModel):
     title: str = Field(..., min_length=1)
     director_id: int
     release_year: int = Field(..., ge=1900, le=2100)
-    cast: Optional[str]
+    cast: Optional[str] = None  # Optional for create if not required, but PDF example has it
     genres: List[int]  # List of genre IDs
 
 class MovieUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1)
     release_year: Optional[int] = Field(None, ge=1900, le=2100)
-    cast: Optional[str]
-    genres: Optional[List[int]]  # Fix: Optional list of int for genre IDs (not names)
+    cast: Optional[str] = None  # Fix: Ensure optional with = None
+    genres: Optional[List[int]] = None
 
 class Movie(BaseModel):
     id: int
     title: str
     release_year: int
     director: Director
-    genres: List[str]  # Names in response
+    genres: List[str]  # Names, not objects for response
     cast: Optional[str]
     average_rating: Optional[float]
     ratings_count: int
