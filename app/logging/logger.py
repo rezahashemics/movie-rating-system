@@ -1,5 +1,5 @@
 import logging
-from python_json_logger import jsonlogger
+from pythonjsonlogger import jsonlogger
 
 def setup_logging():
     logger = logging.getLogger("movie_rating")
