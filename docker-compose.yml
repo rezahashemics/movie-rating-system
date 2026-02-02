@@ -1,17 +1,42 @@
-version: '3.8'  # Compatible with recent Docker Compose
+version: '3.8'
 
 services:
+  # Database Service
   db:
-    image: postgres:16  # Use latest stable version (or 'postgres:latest')
-    restart: always  # Auto-restart if it crashes
+    image: postgres:16-alpine
+    container_name: movie_postgres
+    restart: always
     environment:
-      POSTGRES_USER: postgres  # Matches your .env
-      POSTGRES_PASSWORD: password  # Matches your .env
-      POSTGRES_DB: movie_db  # Auto-creates this DB on first run
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: movie_db
     ports:
-      - "5432:5432"  # Exposes Postgres on localhost:5432
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
-      - postgres_data:/var/lib/postgresql/data  # Persists data
+      - postgres_data:/var/lib/postgresql/data
+
+  # FastAPI Application Service
+  api:
+    build: .
+    container_name: movie_api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/movie_db
+    # This command waits for DB, runs migrations, seeds data, then starts the server
+    command: >
+      sh -c "alembic upgrade head && 
+             python scripts/seed.py && 
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
-  postgres_data:  # Named volume for data persistence
+  postgres_data:
